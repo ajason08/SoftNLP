@@ -1,11 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import re
-import xlrd
-import xlwt
 import prettytable
 import string
-from operator import itemgetter
 import ServiciosTecnicos.GestorEntradasSalidas
 
 def deleteExpresion(texto, patronInicio, patronFin):
@@ -23,7 +20,7 @@ def getOcurrenciasExpresion(texto, patronInicio, patronFin):
 
 def getOcurrenciasExpresiones(texto,expresiones):
     # retorna la lista con las ocurrencias de los patrones
-    listaE = [] 
+    listaE = []
     for expresion in expresiones:
         listaE = listaE +re.findall(expresion,texto)
     return listaE
