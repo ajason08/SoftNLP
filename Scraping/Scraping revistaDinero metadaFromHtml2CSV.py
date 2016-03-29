@@ -1,14 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-#INSTRUCCIONES:
+#INSTRUCCIONES knime:
 # eliminar las lineas referentes al utf-8 (primeras dos)
 
 import timeit
 from pandas import *
 import re
 from urllib import *
-from ServiciosTecnicos.GestorEntradasSalidas import *
+#from ServiciosTecnicos.GestorEntradasSalidas import *
 from AnalisisLinguistico.AnalisisMorfologico import *
 
 '''
@@ -18,11 +18,10 @@ print abs((fin-ini)*1000)
 '''
 
 '''
-ESTE SCRIPT OBTENDRÁ TODAS LOS ARTICULOS DE UNA PAGINA WEB DE PERIODICOS LA CUAL CUMPLA CON PATRONES DE SCRABING,
-
+NIVEL DE ARTICULO: OBTENER metadatos DE LA NOTICIA
 ---VERSION - Revista dinero
 '''
-
+#Se obtiene una muestra de htmls con noticias
 htmlsAll = []
 myUrl ="http://www.dinero.com/ws/Buscador/Index/"
 for i in range(2,10):
@@ -32,7 +31,7 @@ for i in range(2,10):
     htmlsAll.append(usock.read().decode("latin-1"))
     usock.close()
 
-# NIVEL DE ARTICULO: OBTENER EL PARRAFO DE LA NOTICIA DEL ARTICULO
+
 
 allFails = []
 titulosAll = []
