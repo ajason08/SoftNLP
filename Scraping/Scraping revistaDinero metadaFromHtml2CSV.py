@@ -32,7 +32,6 @@ for i in range(2,10):
     usock.close()
 
 
-
 allFails = []
 titulosAll = []
 subTitulosAll = []
