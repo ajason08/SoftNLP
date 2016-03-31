@@ -10,7 +10,7 @@ from AnalisisLinguistico.AnalisisMorfologico import *
 
 '''
 ini = timeit.timeit()
-fin = timeit.timeit()
+fin = timeit.timeit() 
 print abs((fin-ini)*1000)
 '''
 
