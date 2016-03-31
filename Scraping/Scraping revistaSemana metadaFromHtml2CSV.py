@@ -10,10 +10,10 @@ from AnalisisLinguistico.AnalisisMorfologico import *
 
 '''
 ini = timeit.timeit()
-fin = timeit.timeit() 
+fin = timeit.timeit()
 print abs((fin-ini)*1000)
 '''
-
+ 
 '''
 ESTE SCRIPT OBTENDRÁ TODAS LOS ARTICULOS DE UNA PAGINA WEB DE PERIODICOS LA CUAL CUMPLA CON PATRONES DE SCRAPING,
 ---VERSION - Revista Semana
