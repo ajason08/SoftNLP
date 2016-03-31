@@ -4,6 +4,7 @@
 import timeit
 from pandas import *
 from urllib import *
+import re
 from ServiciosTecnicos.GestorEntradasSalidas import *
 from AnalisisLinguistico.AnalisisMorfologico import *
 
@@ -14,12 +15,13 @@ print abs((fin-ini)*1000)
 '''
 
 '''
-ESTE SCRIPT OBTENDRÁ TODAS LOS ARTICULOS DE UNA PAGINA WEB DE PERIODICOS LA CUAL CUMPLA CON PATRONES DE SCRABING,
-
----VERSION - Revista dinero
+ESTE SCRIPT OBTENDRÁ TODAS LOS ARTICULOS DE UNA PAGINA WEB DE PERIODICOS LA CUAL CUMPLA CON PATRONES DE SCRAPING,
+---VERSION - Revista Semana
 '''
+#31 marzo 2016 no saco resultados desde la web, si en htmls guardados en 2015
 
 htmlsAll = []
+#Se obtiene una muestra de htmls con noticias
 myUrl ="http://www.semana.com/vida-moderna/articulo/un-tigre-una-cabra-del-zoologico-de-rusia-son-amigos/"
 for i in range(201,202):
     url = myUrl+(42036).__str__()+"-3"
@@ -28,7 +30,6 @@ for i in range(201,202):
     htmlsAll.append(usock.read().decode("latin-1"))
     usock.close()
 
-# NIVEL DE ARTICULO: OBTENER EL PARRAFO DE LA NOTICIA DEL ARTICULO
 
 allFails = []
 titulosAll = []
@@ -50,11 +51,13 @@ while contador < len(htmlsAll):
         pInInf = '<!DOCTYPE html>'
         pFinInf ="<!--Traffic Control-->"
         #toda info
-
         indiceIn=data.find(pInInf)
         indiceFin= data.find(pFinInf)
         info=data[indiceIn:indiceFin]
-        print indiceIn, indiceFin
+
+        print "aja e", len(info)
+        print "info general:", info[0:50]
+
         pInTit = '<meta property="ps:title" content="'
         pFinTit = '"/>'
         pInUrl= '<meta property="ps:url" content='
@@ -72,9 +75,8 @@ while contador < len(htmlsAll):
         indiceFin= tituloArt.find(pFinTit)
         tituloArt=tituloArt[:indiceFin]
 
-        print "loool"
-        print info
-        #tituloArt = getOcurrenciasExpresion(info,pInTit,pFinTit)[0]
+        tituloArt = getOcurrenciasExpresion(info,pInTit,pFinTit)[0]
+        print tituloArt, "el titulo ps"
         urlArt = getOcurrenciasExpresion(info,pInUrl,pFinUrl)[0]
         # subtitulo
         ocurr = getOcurrenciasExpresion(info,pInSubTit,pFinSubTit)
@@ -132,10 +134,10 @@ while contador < len(htmlsAll):
 
         # Muestro resultados limpios
         print urlArt
-        print "\n Titulo\n", tituloArt,"\n"
-        print "\n SubTitulo\n", subTituloArt,"\n"
-        print "\n Fecha: ", fechaArt, "\n"
-        print "\n articulo \n", articulo
+        #print "\n Titulo\n", tituloArt,"\n"
+        #print "\n SubTitulo\n", subTituloArt,"\n"
+        #print "\n Fecha: ", fechaArt, "\n"
+        #print "\n articulo \n", articulo
         contador +=1
     except:
         titulosAll.append("none")
