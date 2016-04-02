@@ -6,7 +6,7 @@ import unicodedata
 
 
 
-def indiceVector(vector, word):
+def indiceVector(vector, word): 
     try:
         pos = vector.index(word)
     except ValueError:
