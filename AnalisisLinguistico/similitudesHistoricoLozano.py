@@ -6,11 +6,11 @@ import unicodedata
 
 
 
-def indiceVector(vector, word): 
+def indiceVector(vector, word):
     try:
         pos = vector.index(word)
     except ValueError:
-        pos=-1
+        pos=-1 
     return pos
 
 def remove_accents(data):
