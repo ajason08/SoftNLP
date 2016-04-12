@@ -1,13 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-#from __future__ import unicode_literals
 from pandas import *
 import re
 from urllib import *
 import sys
-from ServiciosTecnicos.GestorEntradasSalidas import *
-#from AnalisisLinguistico.AnalisisMorfologico import *
+#from ServiciosTecnicos.GestorEntradasSalidas import *
 import time
 import numpy
 '''
@@ -74,8 +72,12 @@ def getHtmlFromUrl(indice):
         todasPagUrls.append(indice)
 
 #'''# NIVEL LISTAS: OBTENER TODAS LAS URL DE LAS NOTICIAS
-#contiene el sufijo que determina la pagina dentro de una categoria, cada pagina contiene 10 links a noticias
-paginas = range(0,30,10)#270
+
+
+#parametros
+categoria = 3
+# paginas contiene los sufijo que determinan la pagina dentro de una categoria, cada pagina contiene 10 links a noticias
+paginas = range(0,10,10)#270
 
 fallidasOutput = (np.ones(len(paginas))).astype(int)
 urlsAll = []
@@ -85,10 +87,10 @@ fails = []
 log = []
 miUrl = ""
 
-seccion = 13
+
 urlBase = "http://www.procuraduria.gov.co/portal/index.jsp?option=net.comtor.cms.frontend.component.pagefactory.NewsComponentPageFactory&action=view-category&category="
 sufijoUrl = '&wpgn=null&max_results=10&first_result='
-myUrl=urlBase+seccion.__str__()+sufijoUrl
+myUrl=urlBase+categoria.__str__()+sufijoUrl
 
 #detecta la zona donde estan las urls
 patronInicio= '<p>Actualidad y noticias</p>'
