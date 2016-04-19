@@ -80,7 +80,8 @@ while contador < len(htmlsAll):
         pFinAutor = '<'
         pInFecha = 'Fecha Publicaci&oacute;n:'
         pFinFecha = '</'
-        pInArt = 'style="font-size:12px">'
+        pInArt = 'style="font-size:'
+
         pFinArt = pFinInf
 
         #toda info
@@ -120,11 +121,12 @@ while contador < len(htmlsAll):
         # whiteSpaces y simbolos
         articulo = deleteExpresion(articulo,"<!--","-->")
         articulo = deleteExpresion(articulo,"<",">")
-        articulo = articulo.replace("#","")
-
+        articulo = articulo.replace('12px" align="justify">',"")
+        articulo = articulo.replace('12px">',"")
         articulo = articulo.replace(chr(9),"")      # tabulador normal
         articulo = articulo.replace(chr(10),"")     # tabulador extraño
         articulo = articulo.replace(chr(13),"")     # tabulador extraño 2
+        articulo = articulo[len(pInArt):]
         # final
         articulo = articulo.strip()
         if len(articulo)<2:
@@ -145,7 +147,7 @@ while contador < len(htmlsAll):
         # Muestro resultados limpios
         print "\n Titulo\n", tituloArt,"\n"
         print "\n SubTitulo\n", subTituloArt,"\n"
-        print "\n Fecha:", fechaArt, "\n" 
+        print "\n Fecha:", fechaArt, "\n"
         print "\n articulo \n", articulo
         contador +=1
     except:
