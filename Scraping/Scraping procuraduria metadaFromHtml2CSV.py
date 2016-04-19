@@ -145,7 +145,7 @@ while contador < len(htmlsAll):
         # Muestro resultados limpios
         print "\n Titulo\n", tituloArt,"\n"
         print "\n SubTitulo\n", subTituloArt,"\n"
-        print "\n Fecha:", fechaArt, "\n"
+        print "\n Fecha:", fechaArt, "\n" 
         print "\n articulo \n", articulo
         contador +=1
     except:
