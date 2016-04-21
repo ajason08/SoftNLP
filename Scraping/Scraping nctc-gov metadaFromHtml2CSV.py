@@ -98,10 +98,6 @@ def scrapingForBuscado(data):
     pInInfNombre = '<!-- InstanceBeginEditable name="Profile" -->'
     pFinInfNombre ='<!-- InstanceEndEditable -->'
 
-    # patrones metadatos
-    #pInNombre = '<img alt="'
-    #pFinNombre = '"'
-
     pInNombre = 'alt="'
     pFinNombre = '"'
 
@@ -193,22 +189,3 @@ output_table = DataFrame({
                 'fallidas' : allFails
                 })
 print allFails
-
-
-'''
-# Limpiar articulo
-# whiteSpaces y simbolos
-articulo = deleteExpresion(articulo,"<!--","-->")
-articulo = deleteExpresion(articulo,"<",">")
-articulo = articulo.replace('12px" align="justify">',"")
-articulo = articulo.replace('12px">',"")
-articulo = articulo.replace(chr(9),"")      # tabulador normal
-articulo = articulo.replace(chr(10),"")     # tabulador extraño
-articulo = articulo.replace(chr(13),"")     # tabulador extraño 2
-articulo = articulo[len(pInArt):]
-# final
-articulo = articulo.strip()
-if len(articulo)<2:
-    articulo = "none"
-    falloUrl = True
-'''
