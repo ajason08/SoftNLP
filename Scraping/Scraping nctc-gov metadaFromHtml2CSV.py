@@ -20,7 +20,7 @@ print abs((fin-ini)*1000)
 
 '''
 NIVEL DE ARTICULO: OBTENER metadatos DE LA NOTICIA
----VERSION -
+---VERSION - NCTC
 '''
 #Se obtiene una muestra de htmls con noticias
 
@@ -99,7 +99,10 @@ def scrapingForBuscado(data):
     pFinInfNombre ='<!-- InstanceEndEditable -->'
 
     # patrones metadatos
-    pInNombre = '<img alt="'
+    #pInNombre = '<img alt="'
+    #pFinNombre = '"'
+
+    pInNombre = 'alt="'
     pFinNombre = '"'
 
     pInDescripcion = '<!-- InstanceBeginEditable name="ProfieText" -->'
@@ -139,10 +142,14 @@ def scrapingForBuscado(data):
 htmlsAll = []
 caracteristicas= []
 caracteristicas.append("x")
+caracteristicas.append("x")
 caracteristicas.append("none")
 caracteristicas.append("none")
+
+# obtengo una muestra de urls
 urls = []
 urls.append("https://www.nctc.gov/site/profiles/abdelbasit_hamad.html")
+urls.append("https://www.nctc.gov/site/profiles/ayman_al_zawahiri.html")
 urls.append("https://www.nctc.gov/site/profiles/abd_al_hadi_al_iraqi.html")
 urls.append("https://www.nctc.gov/site/profiles/abu_khabab_al_masri.html")
 for url in urls:
