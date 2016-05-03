@@ -87,19 +87,56 @@ def getIndicesPalabrasClavesAND(vector, keywords):
     return indices
 
 
-def frecuenciasRelativasPonderadas(parrafoVector,keywords, pesos, frecuenciasSignificativas=0):
-    # dado un texto separado por palabras y ciertas palabras claves, retorna una lista de palabras (palabrasUniq)
-    # cercanas (radio) a cada palabra clave y su respectiva cantidad de ocurrencias
-    # el tamaño del vencidario esta dado por el tamaño del vector de pesos, ademas, los vecindarios no van mas alla
-    # de donde inicia o acaba el texto (obviamente) y tampoco mas alla de puntos seguidos o finales, esto para precisar el contexto semantico
+def eliminaStopWords(categoriasEliminar, categoriasG, palabras, lemas):
+    # dadas ciertas palabras claves, se buscan en el vector de categorias
+    # y se eliminan las palabras correspondientes de los vectores de palabras(palabras y lemas)
+    # !!!se puede mejorar usando el metodo de obtener indices
+    newCat = []
+    newLem = []
+    newPal = []
+    if len(categoriasG)==len(lemas):
+        i=0
+        j=0
+        for i in range(len(lemas)):
+            existe= False
+            for j in range(len(categoriasEliminar)):
+                if categoriasG[i]==categoriasEliminar[j]:
+                    existe=True
+                    break
+            if existe==False:
+                    newCat.append(categoriasG[i])
+                    newLem.append(lemas[i])
+                    newPal.append(palabras[i])
+    else:
+        print "ERROR: Las categorias y lemas tienen diferente dimension"
+    return newPal, newCat, newLem
 
-    pivotes = getIndicesPalabrasClavesOR(parrafoVector,keywords)                                                   #capturo los indices de ocurrencias
-    palabrasUniq = []                                                               # define una lista de palabras sin repeticion
+def frecuenciasRelativasPonderadas(parrafoVector,keywords, pesos, frecuenciasSignificativas=0):
+    # Dado un texto y ciertos keywords, retorna un conjunto de palabras cercanas a los keywords, y su cercania relativa.
+    # Las palabras se retornan en una matriz de palabras (lista de listas) con la siguiente forma:
+    # [[key1,rel1, rel2, rel3 ],
+    #   key2,rel1, rel2, rel3 ], ...]
+    # las palabras relacionadas a cada keyword seran del segundo termino en adelante.
+    #
+    # El concepto de cercania busca una solucion semantica sin lograrla, pues no usa contendio lexico, sino que se basa
+    # en asignacion de pesos al texto cercano a los keywords (distancia radial), luego cada palabra acumula pesos,
+    # los pesos de cada palabra relacionada seran devueltos en una matriz de pesos isomorfa a la de las palabras
+
+    # El tamaño del vencidario (radio de interes) esta dado por el tamaño del vector de pesos, el cual asigna 1 peso en
+    # cada casilla que se corresponde con la cercania a cada palabra.
+    # Esto es, si L=len(pesos) y k=pos(key) el Vecindario de key es texto[k-L:k+L]
+
+    # NOTA:
+    # Considerando el analisis por parrafos, el vecindario sale del parrafo, esto para precisar el contexto semantico.
+    # Aun no se implementa la solucion que acepte keywords multiwords
+
+    pivotes = getIndicesPalabrasClavesOR(parrafoVector,keywords)                                                                #capturo los indices de ocurrencias
+    palabrasUniq = []                                                                                                   # define una lista de palabras sin repeticion
     cantidad = []
     valor = []
     radio=len(pesos)
     if pivotes==[]:
-        print "no hay coincidencias de palabras claves en el parrafoVector"
+        print "no hay coincidencias de palabras claves en el texto"
         return
     for pivote in pivotes:
         # recorto para limites del texto
@@ -153,29 +190,119 @@ def frecuenciasRelativasPonderadas(parrafoVector,keywords, pesos, frecuenciasSig
             #tabla.add_row([palabrasUniq[i], cantidad[i], valor[i]])
     print tabla
 
-def eliminaStopWords(categoriasEliminar, categoriasG, palabras, lemas):
-    # dadas ciertas palabras claves, se buscan en el vector de categorias
-    # y se eliminan las palabras correspondientes de los vectores de palabras(palabras y lemas)
-    # !!!se puede mejorar usando el metodo de obtener indices
-    newCat = []
-    newLem = []
-    newPal = []
-    if len(categoriasG)==len(lemas):
-        i=0
-        j=0
-        for i in range(len(lemas)):
-            existe= False
-            for j in range(len(categoriasEliminar)):
-                if categoriasG[i]==categoriasEliminar[j]:
-                    existe=True
-                    break
-            if existe==False:
-                    newCat.append(categoriasG[i])
-                    newLem.append(lemas[i])
-                    newPal.append(palabras[i])
-    else:
-        print "ERROR: Las categorias y lemas tienen diferente dimension"
-    return newPal, newCat, newLem
+def get_vecindario_from_pivote(pivote, texto_palabras, radio, tag_punto):
+    # limite izquierdo del vecindario
+    limite_izq=0
+    pos= limite_izq
+    limite_impuesto=False
+    for i in range(radio):
+        pos = pivote-1-i
+        if pos==-1:
+            limite_izq=pos+1
+            limite_impuesto=True
+            break
+        elif texto_palabras[pos]==tag_punto:
+            limite_izq=pos+1
+            limite_impuesto=True
+            break
+    if not limite_impuesto:
+        limite_izq=pos
+
+    #limite derecho del vecindario
+    limite_der=len(texto_palabras)-1
+    pos=limite_der
+    limite_impuesto=False
+    for i in range(radio):
+        pos = pivote+1+i
+        if pos==len(texto_palabras) or texto_palabras[pos]==tag_punto:
+            limite_izq=pos-1
+            limite_impuesto=True
+            break
+    if not limite_impuesto:
+        limite_der=pos
+
+    # no se guardan los puntos en los vecindarios
+    vecindario = texto_palabras[limite_izq:limite_der+1]                                                            # +1 porque recorta asi [inicio,final)
+    pivote_vecindario = pivote-limite_izq                                                                           # posicion del pivote en el nuevo vectorVecindario
+    return vecindario, pivote_vecindario
+def frecuenciasRelativasPonderadas2(texto,keywords_base, pesos, tag_punto = ".",):# frecuenciasSignificativas=0):
+    # Dado un texto y ciertos keywords, retorna un conjunto de palabras cercanas a los keywords, y su cercania relativa.
+    # Las palabras se retornan en una matriz de keywords (lista de listas) llamdada keywords_all con la siguiente forma:
+    # [[key1,rel1, rel2, rel3 ],
+    #   key2,rel1, rel2, rel3 ], ...]
+    # las palabras relacionadas a cada keyword seran del segundo termino en adelante.
+    #
+    # El concepto de cercania busca una solucion semantica sin lograrla, pues no usa contendio lexico, sino que se basa
+    # en asignacion de pesos al texto cercano a los keywords (distancia radial), luego cada palabra acumula pesos,
+    # los pesos acumulados seran devueltos en una matriz de indice de cercania_relativa, isomorfa a keywords_all
+
+    # El tamaño del vencidario (radio de interes) esta dado por el tamaño del vector de pesos, el cual asigna 1 peso en
+    # cada casilla que se corresponde con la cercania a cada palabra.
+    # Esto es, si L=len(pesos) y k=pos(key) el Vecindario de key es texto[k-L:k+L]
+    #
+    # NOTA:
+    # Considerando el analisis por parrafos, el vecindario no sale del parrafo, esto para precisar el contexto semantico.
+    # Aun no se implementa la solucion que acepte keywords multiwords
+    texto_palabras = texto.split()
+    radio=len(pesos)
+    keywords_all =[]
+
+    cercania_relativa_all=[]
+    for key in keywords_base:
+        keywords_cer = []                                                                                               # son las palabras cercanas a key
+        cercania_relativa = []        
+        keywords_cer.append(key)
+        cercania_relativa.append(0)
+        
+        # cada pivote es el indice en el texto donde se encuentra una ocurrencia de key, por tanto cada pivote implica un vecindario.
+        # -------------------MODIFICAR INDICE PALABRAS CLAVES OR ?????
+        # debo limpiar vecindarios duplicados (varios pivotes en el mismo vecindario)?, seguramente es muy poco frecuente...
+        pivotes = getIndicesPalabrasClavesOR(texto_palabras,[key])                                                            # capturo los indices de ocurrencias
+        if pivotes==[]:
+            print "no hay coincidencias de", key,"en el texto"
+            continue
+        for pivote in pivotes:
+            vecindario, pivote_vecindario = get_vecindario_from_pivote(pivote,texto_palabras,radio,tag_punto)
+            # Analisis del vecindario.
+            # En cada iteracion se analiza 1 palabra, se cuantifica su peso y se actualiza keywords_cer y
+            # actualizando palabras relacionadas y sus respectivos pesos
+            for i in range(len(vecindario)):
+                palabra_analizada = vecindario[i]
+                if palabra_analizada==key:
+                    continue # asi no podra salir key relacionada a si misma
+                existe = False
+                distancia_al_pivote = abs(i-pivote_vecindario)
+                peso = pesos[distancia_al_pivote-1] #-1 porque el vector comienza en 0
+                for j in range(len(keywords_cer)):
+                    if palabra_analizada==keywords_cer[j]:
+                        #cantidad[j] += 1
+                        cercania_relativa[j] += peso
+                        existe=True
+                        break
+                if not existe:
+                    keywords_cer.append(palabra_analizada)
+                    #cantidad.append(1)
+                    cercania_relativa.append(peso)
+            #fin analisis vecindario
+        keywords_all.append(keywords_cer)
+        cercania_relativa_all.append(cercania_relativa)
+    for i in range(len(keywords_all)):
+        for j in range(len(keywords_all[i])):
+            print keywords_all[i][j], cercania_relativa_all[i][j]
+        print "otra \n"*10
+
+    '''
+    # procesa e imprime el analisis de frecuencias ponderadas
+    #s= "analisis de frecuencias con :\n " + str(keywords) + "\n"
+    #print s*40
+    matrizOrdenadaValor = ServiciosTecnicos.GestorEntradasSalidas.ordenarTabla([palabrasUniq,cantidad,valor],2) # del gestor de entradas y salidas
+    tabla = prettytable.PrettyTable(['Lema', 'Frecuencia', 'Valor'])
+    for i in range(len(palabrasUniq)):
+        if matrizOrdenadaValor[i][1]>=frecuenciasSignificativas:
+            tabla.add_row([matrizOrdenadaValor[i][0], matrizOrdenadaValor[i][1], matrizOrdenadaValor[i][2]])
+            #tabla.add_row([palabrasUniq[i], cantidad[i], valor[i]])
+    print tabla
+    '''
 
 
 def getTodosContextos(textoVector, palabraClaves, signoInicial, signoFinal):
