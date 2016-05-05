@@ -191,17 +191,21 @@ def frecuenciasRelativasPonderadas(parrafoVector,keywords, pesos, frecuenciasSig
     print tabla
 
 def get_vecindario_from_pivote(pivote, texto_palabras, radio, tag_punto):
+    #contexto = texto_palabras[pivote-radio-3:pivote+radio+3]
+    #contextoLeg = vector2paragraph(texto_palabras[pivote-radio-3:pivote+radio+3])
+
     # limite izquierdo del vecindario
     limite_izq=0
     pos= limite_izq
     limite_impuesto=False
     for i in range(radio):
         pos = pivote-1-i
+        palabra = texto_palabras[pos]
         if pos==-1:
             limite_izq=pos+1
             limite_impuesto=True
             break
-        elif texto_palabras[pos]==tag_punto:
+        elif palabra==tag_punto:
             limite_izq=pos+1
             limite_impuesto=True
             break
@@ -214,8 +218,13 @@ def get_vecindario_from_pivote(pivote, texto_palabras, radio, tag_punto):
     limite_impuesto=False
     for i in range(radio):
         pos = pivote+1+i
-        if pos==len(texto_palabras) or texto_palabras[pos]==tag_punto:
-            limite_izq=pos-1
+        palabra = texto_palabras[pos]
+        if pos==len(texto_palabras):
+            limite_der=pos-1
+            limite_impuesto=True
+            break
+        elif palabra==tag_punto:
+            limite_der=pos-1
             limite_impuesto=True
             break
     if not limite_impuesto:
@@ -241,13 +250,13 @@ def frecuenciasRelativasPonderadas2(texto,keywords_base, pesos, tag_punto = ".",
     # Esto es, si L=len(pesos) y k=pos(key) el Vecindario de key es texto[k-L:k+L]
     #
     # NOTA:
-    # Considerando el analisis por parrafos, el vecindario no sale del parrafo, esto para precisar el contexto semantico.
+    # Considerando el analisis por parrafos el vecindario no sale del parrafo, esto para precisar el contexto semantico.
     # Aun no se implementa la solucion que acepte keywords multiwords
     texto_palabras = texto.split()
     radio=len(pesos)
     keywords_all =[]
-
     cercania_relativa_all=[]
+
     for key in keywords_base:
         keywords_cer = []                                                                                               # son las palabras cercanas a key
         cercania_relativa = []        
@@ -263,6 +272,7 @@ def frecuenciasRelativasPonderadas2(texto,keywords_base, pesos, tag_punto = ".",
             continue
         for pivote in pivotes:
             vecindario, pivote_vecindario = get_vecindario_from_pivote(pivote,texto_palabras,radio,tag_punto)
+
             # Analisis del vecindario.
             # En cada iteracion se analiza 1 palabra, se cuantifica su peso y se actualiza keywords_cer y
             # actualizando palabras relacionadas y sus respectivos pesos
@@ -287,23 +297,11 @@ def frecuenciasRelativasPonderadas2(texto,keywords_base, pesos, tag_punto = ".",
         keywords_all.append(keywords_cer)
         cercania_relativa_all.append(cercania_relativa)
     for i in range(len(keywords_all)):
+        st = "con la key "+keywords_base[i]+ "\n\n"
+        print st*5
         for j in range(len(keywords_all[i])):
             print keywords_all[i][j], cercania_relativa_all[i][j]
-        print "otra \n"*10
-
-    '''
-    # procesa e imprime el analisis de frecuencias ponderadas
-    #s= "analisis de frecuencias con :\n " + str(keywords) + "\n"
-    #print s*40
-    matrizOrdenadaValor = ServiciosTecnicos.GestorEntradasSalidas.ordenarTabla([palabrasUniq,cantidad,valor],2) # del gestor de entradas y salidas
-    tabla = prettytable.PrettyTable(['Lema', 'Frecuencia', 'Valor'])
-    for i in range(len(palabrasUniq)):
-        if matrizOrdenadaValor[i][1]>=frecuenciasSignificativas:
-            tabla.add_row([matrizOrdenadaValor[i][0], matrizOrdenadaValor[i][1], matrizOrdenadaValor[i][2]])
-            #tabla.add_row([palabrasUniq[i], cantidad[i], valor[i]])
-    print tabla
-    '''
-
+    return keywords_all, cercania_relativa_all
 
 def getTodosContextos(textoVector, palabraClaves, signoInicial, signoFinal):
     # Dado un parrafo en formato vector, y una lista de palabras de interes, obtiene el vencindario para cada

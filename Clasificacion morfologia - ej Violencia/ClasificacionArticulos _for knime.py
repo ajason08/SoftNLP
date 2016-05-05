@@ -43,13 +43,12 @@ newCat, newLem = modificarTaggedTNT(palabrasA,categoriaA,lemaA,newPal,newCat,new
 
 # VER UNKNOWNS
 #palabrasXlemas("<unknown>", newLem, newPal)
-miTexto = codecs.open("100articulosPolitica.txt", "r",encoding='utf-8').read()
+miTexto = codecs.open("xART.txt", "r",encoding='utf-8').read()
 keywords = ["ministro","fiscalia"]
  # obtener keywords relacionados
 pesos = range(1,10)
 pesos.reverse()
-print "PESOS", pesos, len(pesos), exit()
-
+#print "PESOS", pesos, len(pesos), exit()
 frecuenciasRelativasPonderadas2(miTexto, keywords, pesos)
 exit()
 
